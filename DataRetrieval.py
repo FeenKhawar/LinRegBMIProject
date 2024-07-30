@@ -19,10 +19,10 @@ columns_num_to_keep_2020 = ['0', '5', '66', '68', '236', '240', '245', '252']
 columns_num_to_keep_2021 = ['0', '5', '73', '75', '256', '260', '265', '272']
 columns_num_to_keep_2022 = ['0', '5', '66', '68', '281', '285', '290', '297']
 
-column_renames_2019 = {"0" : "state", "5" : "year", "72" : "income", "73" : "weight (Ib)", "267" : "race", "271" : "sex", "276" : "height (in)", "283" : "education"}
-column_renames_2020 = {"0" : "state", "5" : "year", "66" : "income", "68" : "weight (Ib)", "236" : "race", "240" : "sex", "245" : "height (in)", "252" : "education"}
-column_renames_2021 = {"0" : "state", "5" : "year", "73" : "income", "75" : "weight (Ib)", "256" : "race", "260" : "sex", "265" : "height (in)", "272" : "education"}
-column_renames_2022 = {"0" : "state", "5" : "year", "66" : "income", "68" : "weight (Ib)", "281" : "race", "285" : "sex", "290" : "height (in)", "297" : "education"}
+column_renames_2019 = {"0" : "state code", "5" : "year", "72" : "income", "73" : "weight (Ib)", "267" : "race", "271" : "sex", "276" : "height (in)", "283" : "education"}
+column_renames_2020 = {"0" : "state code", "5" : "year", "66" : "income", "68" : "weight (Ib)", "236" : "race", "240" : "sex", "245" : "height (in)", "252" : "education"}
+column_renames_2021 = {"0" : "state code", "5" : "year", "73" : "income", "75" : "weight (Ib)", "256" : "race", "260" : "sex", "265" : "height (in)", "272" : "education"}
+column_renames_2022 = {"0" : "state code", "5" : "year", "66" : "income", "68" : "weight (Ib)", "281" : "race", "285" : "sex", "290" : "height (in)", "297" : "education"}
 
 num_of_variables_2019 = 342
 num_of_variables_2020 = 279
@@ -105,10 +105,10 @@ columns_num_to_keep_2020 = ['0', '5', '66', '68', '236', '240', '245', '252']
 columns_num_to_keep_2021 = ['0', '5', '73', '75', '256', '260', '265', '272']
 columns_num_to_keep_2022 = ['0', '5', '66', '68', '281', '285', '290', '297']
 
-column_renames_2019 = {"0" : "state", "5" : "year", "72" : "income", "73" : "weight (Ib)", "267" : "race", "271" : "sex", "276" : "height (in)", "283" : "education"}
-column_renames_2020 = {"0" : "state", "5" : "year", "66" : "income", "68" : "weight (Ib)", "236" : "race", "240" : "sex", "245" : "height (in)", "252" : "education"}
-column_renames_2021 = {"0" : "state", "5" : "year", "73" : "income", "75" : "weight (Ib)", "256" : "race", "260" : "sex", "265" : "height (in)", "272" : "education"}
-column_renames_2022 = {"0" : "state", "5" : "year", "66" : "income", "68" : "weight (Ib)", "281" : "race", "285" : "sex", "290" : "height (in)", "297" : "education"}
+column_renames_2019 = {"0" : "state code", "5" : "year", "72" : "income", "73" : "weight (Ib)", "267" : "race", "271" : "sex", "276" : "height (in)", "283" : "education"}
+column_renames_2020 = {"0" : "state code", "5" : "year", "66" : "income", "68" : "weight (Ib)", "236" : "race", "240" : "sex", "245" : "height (in)", "252" : "education"}
+column_renames_2021 = {"0" : "state code", "5" : "year", "73" : "income", "75" : "weight (Ib)", "256" : "race", "260" : "sex", "265" : "height (in)", "272" : "education"}
+column_renames_2022 = {"0" : "state code", "5" : "year", "66" : "income", "68" : "weight (Ib)", "281" : "race", "285" : "sex", "290" : "height (in)", "297" : "education"}
 
 num_of_variables_2019 = 342
 num_of_variables_2020 = 279
@@ -116,13 +116,16 @@ num_of_variables_2021 = 303
 num_of_variables_2022 = 328
 
 def create_year_and_url_variables(start, end):
-    for year in range(start, end + 1):
-        DCV[f'y{year}'] = year
-        DCV[f'url_{year}'] = f"https://www.cdc.gov/brfss/annual_data/{year}/files/LLCP{year}XPT.zip"
-        SCV[f"columns_num_to_keep_{year}"] = globals()[f"columns_num_to_keep_{year}"]
-        SCV[f"column_renames_{year}"] = globals()[f"column_renames_{year}"]
-        SCV[f"num_of_variables_{year}"] = globals()[f"num_of_variables_{year}"]
-    # Potentially will add part for 2010 and below years (which have a different url format)
+    if os.path.exists("DatasetForLinearRegressionsOnBMI.csv"):
+        return
+    else:
+        for year in range(start, end + 1):
+            DCV[f'y{year}'] = year
+            DCV[f'url_{year}'] = f"https://www.cdc.gov/brfss/annual_data/{year}/files/LLCP{year}XPT.zip"
+            SCV[f"columns_num_to_keep_{year}"] = globals()[f"columns_num_to_keep_{year}"]
+            SCV[f"column_renames_{year}"] = globals()[f"column_renames_{year}"]
+            SCV[f"num_of_variables_{year}"] = globals()[f"num_of_variables_{year}"]
+        # Potentially will add part for 2010 and below years (which have a different url format)
 
 def get_yearly_data(url_year, columns_num_to_keep_year, column_renames_year, N, y):
     
@@ -181,13 +184,12 @@ def get_yearly_data(url_year, columns_num_to_keep_year, column_renames_year, N, 
         # Save the filtered DataFrame to the same file, replacing the old dataset
 
         # This code cleans up the data by removing any rows with NaN and any values that represent groups such as "Refused to answer" or "No response" 
-        # df = df[df["state"] < 60]
         df = df[df["education"] != 9.0]
         df = df[df["income"] < 13.0]
         df = df[df["race"] != 9.0]
         # I remove any values of weight above 999 because some values in kilograms are indicated by an initial 9 (i.e. 9068) and groups such as "Don't Know" and "Refused" are above 999
         df = df[df["weight (Ib)"] < 999.0]
-        df = df[df["state"] < 60]
+        df = df[df["state code"] < 60]
         df = df.dropna()
 
         # Create the BMI row
@@ -215,6 +217,8 @@ def concatenate_and_delete_files(year_start, number_of_years):
 # If the file exists, skip everything below
 if os.path.exists("UnemploymentData.csv"):
     print("UnemploymentData.csv already exists.")
+elif os.path.exists("DatasetForLinearRegressionsOnBMI.csv"):
+    print("DatasetForLinearRegressionsOnBMI.csv already exists.")
 else:
 
     # Download the Excel file
@@ -258,15 +262,47 @@ else:
     df = pd.melt(df, id_vars=["state"], var_name="year", value_name="unemployment rate")
 
     # Map the state names to the state codes, doing this now will help later
-    df["state_code"] = df["state"].map(states_dict)
+    df["state code"] = df["state"].map(states_dict)
 
     df.to_csv("UnemploymentData.csv", index=False)
 
 create_year_and_url_variables(year_start, year_end)
 
-for year in range(year_start, year_end  + 1):
-    dataset_for_year = get_yearly_data(DCV[f"url_{year}"], SCV[f"columns_num_to_keep_{year}"], SCV[f"column_renames_{year}"], SCV[f"num_of_variables_{year}"], DCV[f"y{year}"])
+if not os.path.exists("DatasetForLinearRegressionsOnBMI.csv"):
+    for year in range(year_start, year_end  + 1):
+        dataset_for_year = get_yearly_data(DCV[f"url_{year}"], SCV[f"columns_num_to_keep_{year}"], SCV[f"column_renames_{year}"], SCV[f"num_of_variables_{year}"], DCV[f"y{year}"])
 
 concatenate_and_delete_files(year_start, (year_end - year_start + 1))
+
+try:
+    # Merge the two datasets on "state code" and "year"
+    BMI_dataset = pd.read_csv("DatasetForLinearRegressionsOnBMI.csv")
+    UE_dataset = pd.read_csv("UnemploymentData.csv")
+    merged_dataset = pd.merge(BMI_dataset, UE_dataset, on=["state code", "year"])
+    merged_dataset.to_csv("DatasetForLinearRegressionsOnBMI.csv", index=False)
+
+    # Rearrange the columns to appear cleaner and more in-order
+    merged_dataset = pd.read_csv("DatasetForLinearRegressionsOnBMI.csv")
+    column_to_move = merged_dataset.pop("state")
+    merged_dataset.insert(0, "state", column_to_move)
+    column_to_move = merged_dataset.pop("unemployment rate")
+    merged_dataset.insert(3, "unemployment rate", column_to_move)
+    column_to_move = merged_dataset.pop("weight (Ib)")
+    third_last_column = len(merged_dataset.columns) - 3
+    merged_dataset.insert(third_last_column, "weight Ib", column_to_move)
+    column_to_move = merged_dataset.pop("education")
+    merged_dataset.insert(7, "education", column_to_move)
+    column_to_move = merged_dataset.pop("sex")
+    merged_dataset.insert(4, "sex", column_to_move)
+    print(merged_dataset.columns)
+    merged_dataset.to_csv("DatasetForLinearRegressionsOnBMI.csv", index=False)
+
+    merge_success = True
+except:
+    print("Could not merge datasets.")
+    merge_success = False
+
+if (merge_success==True) and os.path.exists("UnemploymentData.csv"):
+    os.remove("UnemploymentData.csv")
 
 print("Cool")
