@@ -10,7 +10,9 @@ will usually say what the number of variables is. For column_renames_{year}, one
 rest of the variables in its given year. For example, for 2019, the income variable is the 73rd variable (starting from 0) to show up. Then, put the number with the 
 name one would like to name said variable. The columns_num_to_keep_{year} is effectively the same as column_renames_{year}, except the name of the variables is not 
 needed, simply the number the variables show up in.
-It should be noted that there can often be multiple very similar variables of a given interest, for example, the BRFSS for year 2019 offers multiple variables 
+    I personally copied the entire table of variable names from the "Variable Layout" on any given yearly data page and then pasted it into an excel spreadsheet. I then
+added a column counting from 0 (at the top) all the way down, this helped me figure out what numbered order a given variable showed up as.
+    It should be noted that there can often be multiple very similar variables of a given interest, for example, the BRFSS for year 2019 offers multiple variables 
 related to income. It is up to the reader to figure out what specific variables they want by reading the manual. 
 CAUTION: 
         During my time coding this project, getting the data I wanted for the variables and years of interest did not give me many problems. However, 2022 was the 
