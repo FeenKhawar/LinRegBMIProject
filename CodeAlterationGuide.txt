@@ -1,0 +1,41 @@
+    The code for this project was made to be as dynamic as possible. Additionally, all the static coding is at the top of the DataRetrival.py file. With that being said, 
+it can be altered to fit one's own regression. The most obvious way it can be altered is by changing the years (keep in mind that the program assumes they must be 
+consecutive) and/or changing the variables of interest. For changing years, it is relatively straightforward. All one must do is put in the year_start and year_end.
+It should be noted that the unemployment rate excel file goes only to 2000, and the BRFSS Annual Data goes to 1988 as well. Also, the url formats for years under 2010
+have a slightly different url format than that of those past 2010 (2010-1990 have the same url format, with 1989 - 1988 having a slighly different one). 
+    To change the variables of interest, it requires one to look into the manual of the respective year. This has to be done with all years involved, as the manual (and
+the variables) change from year to year. In the DataRetrival.py file, there is columns_num_to_keep_{year}, column_renames_{year}, and num_of_variables_{year}. Each 
+year will need to have a respective variable among these three variable groups. Getting the num_of_variables_{year} is simple, as the documentation and description 
+will usually say what the number of variables is. For column_renames_{year}, one will have to check the number said variable of interest comes up in relation to the 
+rest of the variables in its given year. For example, for 2019, the income variable is the 73rd variable (starting from 0) to show up. Then, put the number with the 
+name one would like to name said variable. The columns_num_to_keep_{year} is effectively the same as column_renames_{year}, except the name of the variables is not 
+needed, simply the number the variables show up in.
+It should be noted that there can often be multiple very similar variables of a given interest, for example, the BRFSS for year 2019 offers multiple variables 
+related to income. It is up to the reader to figure out what specific variables they want by reading the manual. 
+CAUTION: 
+        During my time coding this project, getting the data I wanted for the variables and years of interest did not give me many problems. However, 2022 was the 
+    exception. For some reason, when reading the data of 2022 into python and into a csv format, some of the variables were off by 2 and all were staggered by 2. For the 
+    variables being staggered by 2, this was due to the program slicing the data (when in a Series format) by the wrong number; 2 less than needed. According to the 
+    documentation, the year 2022 had 326 variables, but I needed the give it 328 variables to properly slice. For some variables being off by 2, if you look closely at 
+    the variables selected for 2022, half are below 100 and the other half are after 275. For some reason, the second-half of the variables were off by 2. I corrected
+    this by manually adding 2 to each of these variable numbers (for example, the variable "education" of 2022 went from number 295 to 297). My best guess is that the 
+    program read two extra variables between 68 and 279, but I am not sure. I spent quite a bit of time trying to figure out why these two errors were happening, however, 
+    I believe the errors were not on my side, but rather due to the nature of transporting a XPT file into a csv format. The original data file is meant for the program 
+    "Stata" and not necessarily for other programs. While it seems arrogant of me to assume that the error lies with the format and file rather than me, I simply cannot 
+    see any other way the errors could have occurred.
+        In regards to the data file, like mentioned before it was originally meant to be handled in Stata. In fact, I was able to fix the 2 errors mentioned above because I 
+    viewed the 2022 data in Stata to see how it was properly suppose to be handled and changed my Python code accordingly. If one does not have Stata, then it would be 
+    helpful to few the data in its entirety (all variables) in python in a csv format before cleaning it and then view the first few rows. If for any given variable, the 
+    numbers of each row do not seem to match at all (for example, if a variable you know is encoded as only 1 and 0 but all rows after the first range wildly) then the 
+    data is probably staggered. On the other hand, if the data for columns seem consistent but simply in the wrong column, then the variable number most likely needs to 
+    altered. Note that not all variables will need to be altered but perhaps only a few. 
+        I am completely unsure if the problems I experienced for 2022 are also present for other years. It is possible that it does, but it is also possible that 2022 was 
+    simply a "weird" year. It is up to the reader to properly figure this out.
+    The program also relies on the states_dict to merge properly with the unemployment data. One can omit both the states_dict and the unemployment data if they do not 
+desire to have it in their altered program. If changing variables, one will need to clean them on their own (requiring alteration to the code in DataRetrival.py at
+around line 173). Also, the re-arranging of columns at line 280 will need to be alter as well (however this section of code isn't really needed for ensure the code 
+works but is just aesthetic). If changing the variables, also remember to alter the graphs and linear regression is PlotsAndGraphs.py and LinearRegressions.py to
+accomodate one's changes.
+    Due to this project being made public, I cannot stop any person from using this code, whether to run it themselves or change it to run their own tests for their own 
+purposes. In fact I encourage it. However, if one does use this code, even if using its foundation for their own projects, I would greatly appreciate being credited 
+for (the parts of) the code that was done by me. Much thanks in advance.

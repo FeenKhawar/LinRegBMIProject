@@ -63,6 +63,7 @@ states_dict = {
     "Nebraska": 31.0,
     "Nevada": 32.0,
     "New Hampshire": 33.0,
+    "New Jersey": 34.0,
     "New Mexico": 35.0,
     "New York": 36.0,
     "North Carolina": 37.0,
@@ -100,32 +101,24 @@ DCV = {}
 # The purpose of putting these in a dictionary is so that later on all the years can be automatically ran in the get_yearly_data loop without manually typing out each year
 SCV = {}
 
-columns_num_to_keep_2019 = ['0', '5', '72', '73', '267', '271', '276', '283']
-columns_num_to_keep_2020 = ['0', '5', '66', '68', '236', '240', '245', '252']
-columns_num_to_keep_2021 = ['0', '5', '73', '75', '256', '260', '265', '272']
-columns_num_to_keep_2022 = ['0', '5', '66', '68', '281', '285', '290', '297']
-
-column_renames_2019 = {"0" : "state code", "5" : "year", "72" : "income", "73" : "weight (Ib)", "267" : "race", "271" : "sex", "276" : "height (in)", "283" : "education"}
-column_renames_2020 = {"0" : "state code", "5" : "year", "66" : "income", "68" : "weight (Ib)", "236" : "race", "240" : "sex", "245" : "height (in)", "252" : "education"}
-column_renames_2021 = {"0" : "state code", "5" : "year", "73" : "income", "75" : "weight (Ib)", "256" : "race", "260" : "sex", "265" : "height (in)", "272" : "education"}
-column_renames_2022 = {"0" : "state code", "5" : "year", "66" : "income", "68" : "weight (Ib)", "281" : "race", "285" : "sex", "290" : "height (in)", "297" : "education"}
-
-num_of_variables_2019 = 342
-num_of_variables_2020 = 279
-num_of_variables_2021 = 303
-num_of_variables_2022 = 328
-
 def create_year_and_url_variables(start, end):
     if os.path.exists("DatasetForLinearRegressionsOnBMI.csv"):
         return
     else:
         for year in range(start, end + 1):
             DCV[f'y{year}'] = year
-            DCV[f'url_{year}'] = f"https://www.cdc.gov/brfss/annual_data/{year}/files/LLCP{year}XPT.zip"
             SCV[f"columns_num_to_keep_{year}"] = globals()[f"columns_num_to_keep_{year}"]
             SCV[f"column_renames_{year}"] = globals()[f"column_renames_{year}"]
             SCV[f"num_of_variables_{year}"] = globals()[f"num_of_variables_{year}"]
-        # Potentially will add part for 2010 and below years (which have a different url format)
+            if year > 2010:
+                DCV[f'url_{year}'] = f"https://www.cdc.gov/brfss/annual_data/{year}/files/LLCP{year}XPT.zip"
+            elif year < 2011:
+                DCV[f'url_{year}'] = f"https://www.cdc.gov/brfss/annual_data/{year}/files/CDBRFS{str(year)[-2:]}XPT.zip"
+            elif year < 2000:
+                print(f"This program cannot support years before year 2000.")
+            # Note: The CDC BRFSS annual data goes all the way to 1988, with the url from 1999 - 1990 being the same as those between 2010 - 2000, and 1989 - 1988 being similar.
+            # However, the unemployment data file the program pulls from only goes as far as 2000. If one wants to run the code with years before 2000, they will need to alter 
+            # or append the file so the unemployment data for said years is available
 
 def get_yearly_data(url_year, columns_num_to_keep_year, column_renames_year, N, y):
     
@@ -184,16 +177,19 @@ def get_yearly_data(url_year, columns_num_to_keep_year, column_renames_year, N, 
         # Save the filtered DataFrame to the same file, replacing the old dataset
 
         # This code cleans up the data by removing any rows with NaN and any values that represent groups such as "Refused to answer" or "No response" 
+        df = df.dropna()
         df = df[df["education"] != 9.0]
         df = df[df["income"] < 13.0]
         df = df[df["race"] != 9.0]
         # I remove any values of weight above 999 because some values in kilograms are indicated by an initial 9 (i.e. 9068) and groups such as "Don't Know" and "Refused" are above 999
         df = df[df["weight (Ib)"] < 999.0]
         df = df[df["state code"] < 60]
-        df = df.dropna()
 
-        # Create the BMI row
+        # Create and clean the BMI row
         df["BMI"] = ((df["weight (Ib)"] * 703) / (df["height (in)"] ** 2)).round(5)
+        # I remove BMI's of less than 10 or greater than 150 as that is nearly physically impossible
+        df = df[df["BMI"] > 10.0]
+        df = df[df["BMI"] < 150.0]
 
         df.to_csv(f'Reconstructed{y}Dataset.csv', index=False)
         print(f"Data for year {y} cleaned successfully.")
@@ -242,16 +238,16 @@ else:
             x.append(f"Unnamed: {i}")
 
     # Set the columns to keep in a variable and drop all other variables
-    # Note: We add in X so that if reran, it doesn't cause issues
+    # Note: We add in year_list so that if reran, it doesn't cause issues
     columns_to_keep = set(x + year_list + ["Unemployment Rates for States"])
     df = df.iloc[:, df.columns.isin(columns_to_keep)]
 
-    # Ensure X has the correct length and your df has the appropriate number of columns to be modified.
+    # Ensure year_list has the correct length and your df has the appropriate number of columns to be modified.
     # This assumes the columns you want to modify are in a continuous range starting from the second column.
     if len(year_list) <= len(df.columns) - 1:
         df.columns = [df.columns[0]] + [f"{year_list[i]}" if i < len(year_list) else col for i, col in enumerate(df.columns[1:])]
     else:
-        raise ValueError("Length of X exceeds the number of columns available for renaming.")
+        raise ValueError("Length of year_list exceeds the number of columns available for renaming.")
 
     # Drop all columns that contain "Unnamed" as we don't want them for our data
     phrase = "Unnamed: "
@@ -261,8 +257,15 @@ else:
     df = df.rename(columns={"Unemployment Rates for States" : "state"})
     df = pd.melt(df, id_vars=["state"], var_name="year", value_name="unemployment rate")
 
+    # Drop any rows with NaN values
+    df = df.dropna()
+
     # Map the state names to the state codes, doing this now will help later
     df["state code"] = df["state"].map(states_dict)
+
+    # Make a column for the natural log of the unemployment rates
+    df['unemployment rate'] = pd.to_numeric(df['unemployment rate'], errors='coerce')
+    df["ln(unemployment rate)"] = np.log(df["unemployment rate"])
 
     df.to_csv("UnemploymentData.csv", index=False)
 
@@ -274,6 +277,7 @@ if not os.path.exists("DatasetForLinearRegressionsOnBMI.csv"):
 
 concatenate_and_delete_files(year_start, (year_end - year_start + 1))
 
+
 try:
     # Merge the two datasets on "state code" and "year"
     BMI_dataset = pd.read_csv("DatasetForLinearRegressionsOnBMI.csv")
@@ -283,18 +287,21 @@ try:
 
     # Rearrange the columns to appear cleaner and more in-order
     merged_dataset = pd.read_csv("DatasetForLinearRegressionsOnBMI.csv")
+
     column_to_move = merged_dataset.pop("state")
     merged_dataset.insert(0, "state", column_to_move)
     column_to_move = merged_dataset.pop("unemployment rate")
     merged_dataset.insert(3, "unemployment rate", column_to_move)
     column_to_move = merged_dataset.pop("weight (Ib)")
     third_last_column = len(merged_dataset.columns) - 3
-    merged_dataset.insert(third_last_column, "weight Ib", column_to_move)
+    merged_dataset.insert(third_last_column, "weight (Ib)", column_to_move)
     column_to_move = merged_dataset.pop("education")
     merged_dataset.insert(7, "education", column_to_move)
     column_to_move = merged_dataset.pop("sex")
     merged_dataset.insert(4, "sex", column_to_move)
-    print(merged_dataset.columns)
+    column_to_move = merged_dataset.pop("ln(unemployment rate)")
+    merged_dataset.insert(4, "ln(unemployment rate)", column_to_move)
+
     merged_dataset.to_csv("DatasetForLinearRegressionsOnBMI.csv", index=False)
 
     merge_success = True
@@ -304,5 +311,3 @@ except:
 
 if (merge_success==True) and os.path.exists("UnemploymentData.csv"):
     os.remove("UnemploymentData.csv")
-
-print("Cool")

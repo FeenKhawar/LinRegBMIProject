@@ -1,0 +1,27 @@
+    The reason the year 2023 is included and available despite the end year being 2022 is because the BRFSS 
+always includes some datapoints for the next year within a given year (why exactly I do not know, perhaps
+they release their data a few weeks after the year end and by then they already have some gotten some 
+information on the next year). They are enough datapoints in 2023 to properly run statistical tests on it.
+    In regards to the length of time it took to write this program, one will see from the github link that 
+this project is contained on that it took around 3 weeks to complete. However I want to make it clear that this 
+was not 3 weeks of a constant full work-day type of schedule. Rather, I picked this project off fairly slowly 
+and I did not work on this project every single day. Due to events and circumstances in my life at the time I 
+did not fully commit to finishing this project as fast as possible. It is also worth noting that as this was
+my first project, things obviously went slowly as everything was a fairly new experience and I wanted to make
+sure I was doing everything to my standards. While I don't have a great estimate for how many hours this 
+project took me nor did I record my hours, the actual amount of time was less than the 3 weeks.
+    This was my first project on python and on github, and I am extremely happy with the results. I genuinely 
+believe I have learned and benefited massively from the process of making this project as well as the many 
+new challenges I had to face. One thing that played a big factor in this was my attempt to make this 
+program as dynamic as possible, essentially making it so any person could take this code and fairly easily
+re-program it for their own interests. While I knew very well I could have hard-coded everything and made 
+everything fairly static, along with not using recursions and such, I thought it was important to try to 
+make this code as readable, functional, and as simple as possible while still maintaining to create a 
+dynamic program. In the process of this, I often found myself making code that was over-complicated and 
+too complex/convoluted, resulting in me trying to brainstorm different ways to approach problems and my 
+goal in a more efficient manner. While the program isn't perfect and it's clear I still have a lot to learn,
+I believe this project helped me in ways that a course or book cannot offer. I also hope that from this 
+program, it becomes clear to any reader that I am capable of working within the Data Science field.
+    As for the future, I hope to continue to work on projects on my own in different fields (such as
+economic or policy). I may also try to make a proper version of this project for Stata. For any 
+criticisms, questions, or concerns about my project(s) or me please contact me by my email, FeenKhawar@gmail.com
